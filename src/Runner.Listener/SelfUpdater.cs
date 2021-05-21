@@ -87,8 +87,11 @@ namespace GitHub.Runner.Listener
                 // kick off update script
                 Process invokeScript = new Process();
 #if OS_WINDOWS
-            invokeScript.StartInfo.FileName = WhichUtil.Which("cmd.exe", trace: Trace);
-            invokeScript.StartInfo.Arguments = $"/c \"{updateScript}\"";
+                // Without shell exec, the process may not have the user's profile loaded (if this process was started with impersonation)
+                invokeScript.StartInfo.UseShellExecute = true;
+
+                invokeScript.StartInfo.FileName = WhichUtil.Which("cmd.exe", trace: Trace);
+                invokeScript.StartInfo.Arguments = $"/c \"{updateScript}\"";
 #elif (OS_OSX || OS_LINUX)
                 invokeScript.StartInfo.FileName = WhichUtil.Which("bash", trace: Trace);
                 invokeScript.StartInfo.Arguments = $"\"{updateScript}\"";
