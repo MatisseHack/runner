@@ -8,7 +8,6 @@ rem  ROOTFOLDER = ./
 rem  EXISTRUNNERVERSION = 2.100.0
 rem  DOWNLOADRUNNERVERSION = 2.101.0 
 rem  UPDATELOG = _diag/SelfUpdate-UTC.log
-rem  RESTARTINTERACTIVERUNNER = 0/1
 
 setlocal
 set runnerpid=_PROCESS_ID_
@@ -17,7 +16,6 @@ set rootfolder=_ROOT_FOLDER_
 set existrunnerversion=_EXIST_RUNNER_VERSION_
 set downloadrunnerversion=_DOWNLOAD_RUNNER_VERSION_
 set logfile=_UPDATE_LOG_
-set restartinteractiverunner=_RESTART_INTERACTIVE_RUNNER_
 
 rem log user who run the script
 echo [%date% %time%] --------whoami-------- >> "%logfile%" 2>&1
@@ -125,15 +123,7 @@ rem runner service host can base on the log file name determin the result of the
 echo [%date% %time%] Rename "%logfile%" to be "%logfile%.succeed" >> "%logfile%" 2>&1
 move "%logfile%" "%logfile%.succeed" >nul
 
-rem restart interactive runner if needed
-if %restartinteractiverunner% equ 1 (
-  echo [%date% %time%] Restart interactive runner >> "%logfile%.succeed" 2>&1
-  endlocal
-  start "Actions Runner" cmd.exe /k "_ROOT_FOLDER_\run.cmd"
-) else (
-  endlocal
-)
-
+endlocal
 goto :eof
 
 :fail
