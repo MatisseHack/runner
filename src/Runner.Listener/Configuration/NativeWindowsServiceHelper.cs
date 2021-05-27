@@ -63,6 +63,8 @@ namespace GitHub.Runner.Listener.Configuration
 
         bool IsRunningInElevatedMode();
 
+        void LoadCurrentUserProfile(out IntPtr tokenHandle, out PROFILEINFO userProfile);
+
         void LoadUserProfile(string domain, string userName, string logonPassword, out IntPtr tokenHandle, out PROFILEINFO userProfile);
 
         void UnloadUserProfile(IntPtr tokenHandle, PROFILEINFO userProfile);
@@ -773,6 +775,23 @@ namespace GitHub.Runner.Listener.Configuration
         public bool IsRunningInElevatedMode()
         {
             return new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+        }
+
+        public void LoadCurrentUserProfile(out IntPtr tokenHandle, out PROFILEINFO userProfile)
+        {
+            Trace.Entering();
+            var currentIdentity = WindowsIdentity.GetCurrent();
+            tokenHandle = currentIdentity.Token;
+
+            userProfile = new PROFILEINFO();
+            userProfile.dwSize = Marshal.SizeOf(typeof(PROFILEINFO));
+            userProfile.lpUserName = currentIdentity.Name;
+            if (!LoadUserProfile(tokenHandle, ref userProfile))
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
+
+            Trace.Info("Successfully loaded the current user's profile");
         }
 
         public void LoadUserProfile(string domain, string userName, string logonPassword, out IntPtr tokenHandle, out PROFILEINFO userProfile)

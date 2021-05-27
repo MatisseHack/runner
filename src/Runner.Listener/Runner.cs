@@ -233,6 +233,11 @@ namespace GitHub.Runner.Listener
                     Trace.Info($"Set runner startup type - {startType}");
                     HostContext.StartupType = startType;
 
+#if OS_WINDOWS
+                    var windowsServiceHelper = HostContext.GetService<INativeWindowsServiceHelper>();
+                    windowsServiceHelper.LoadCurrentUserProfile(out var _, out var _);
+#endif
+
                     // Run the runner interactively or as service
                     return await RunAsync(settings, command.RunOnce);
                 }
